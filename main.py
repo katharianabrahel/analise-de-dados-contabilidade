@@ -25,6 +25,7 @@ def get_subitens(data, selected_conta):
 
 
 def main():
+    st.set_page_config(layout="wide")
     st.title('Análise de Despesas por Função 2018-2021')
     st.sidebar.title('Opções')
     
@@ -39,12 +40,21 @@ def main():
 
         st.subheader('Filtros')
 
-        selected_uf = st.selectbox('Filtrar por UF', data['UF'].unique())
-        selected_coluna = st.selectbox('Filtrar por Coluna', data['Coluna'].unique())
-        selected_ano = st.selectbox('Filtrar por Ano', data['Ano'].unique())
-        conta_options = ['08 - Assistência Social', '09 - Previdência Social','10 - Saúde']
-        selected_conta = st.selectbox('Filtrar por Conta', conta_options)
+        col1, col2, col3, col4 = st.columns(4)
 
+        with col1:
+            selected_uf = st.selectbox('Filtrar por UF', data['UF'].unique())
+
+        with col2:
+           coluna_options = ['Despesas Empenhadas', 'Despesas Liquidadas', 'Despesas Pagas']
+           selected_coluna = st.selectbox('Filtrar por Coluna', coluna_options)
+
+        with col3:
+            selected_ano = st.selectbox('Filtrar por Ano', data['Ano'].unique())
+        with col4:
+            conta_options = ['08 - Assistência Social', '09 - Previdência Social','10 - Saúde']
+            selected_conta = st.selectbox('Filtrar por Conta', conta_options)
+  
         filtered_data = get_subitens(data, selected_conta)
         filtered_data = filtered_data[(filtered_data['UF'] == selected_uf) & (filtered_data['Coluna'] == selected_coluna) & (filtered_data['Ano'] == selected_ano)]
 
