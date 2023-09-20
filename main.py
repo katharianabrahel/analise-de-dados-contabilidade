@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import re
 
 
 @st.cache_data
@@ -15,12 +16,19 @@ def calculate_total_by_coluna(data, selected_uf, selected_ano):
     return total_by_coluna
 
 
+def get_subitens(data, selected_conta):
+    # Obtém o número (xx) do valor selecionado
+    selected_number = selected_conta.split(' ')[0]
+    # Filtra os dados para incluir registros que começam com o mesmo número ou "FUxx"
+    subitens = data[data['Conta'].str.startswith(selected_number) | data['Conta'].str.startswith(f'FU{selected_number}')]
+    return subitens
+
+
 def main():
     st.title('Análise de Despesas por Função 2018-2021')
     st.sidebar.title('Opções')
     
 
-    # Carregue os dados
     file_path = st.sidebar.file_uploader('Carregar arquivo Excel (.xlsx)', type=['xlsx'])
     
     if file_path is not None:
@@ -34,13 +42,15 @@ def main():
         selected_uf = st.selectbox('Filtrar por UF', data['UF'].unique())
         selected_coluna = st.selectbox('Filtrar por Coluna', data['Coluna'].unique())
         selected_ano = st.selectbox('Filtrar por Ano', data['Ano'].unique())
+        conta_options = [conta for conta in data['Conta'].unique() if re.match(r'^\d{2} - ', conta)]
+        selected_conta = st.selectbox('Filtrar por Conta', conta_options)
 
-        filtered_data = data[(data['UF'] == selected_uf) & (data['Coluna'] == selected_coluna) & (data['Ano'] == selected_ano)] 
+        filtered_data = get_subitens(data, selected_conta)
+        filtered_data = filtered_data[(filtered_data['UF'] == selected_uf) & (filtered_data['Coluna'] == selected_coluna) & (filtered_data['Ano'] == selected_ano)]
 
         st.subheader('Dados Filtrados')
         st.write(filtered_data)
 
-        # Calcule a soma dos valores por tipo de despesa (Coluna)
         total_by_coluna = calculate_total_by_coluna(data, selected_uf, selected_ano)
 
         st.subheader('Gráfico de Valor Total por Tipo de Despesa')
