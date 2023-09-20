@@ -42,7 +42,7 @@ def main():
         selected_uf = st.selectbox('Filtrar por UF', data['UF'].unique())
         selected_coluna = st.selectbox('Filtrar por Coluna', data['Coluna'].unique())
         selected_ano = st.selectbox('Filtrar por Ano', data['Ano'].unique())
-        conta_options = [conta for conta in data['Conta'].unique() if re.match(r'^\d{2} - ', conta)]
+        conta_options = ['08 - Assistência Social', '09 - Previdência Social','10 - Saúde']
         selected_conta = st.selectbox('Filtrar por Conta', conta_options)
 
         filtered_data = get_subitens(data, selected_conta)
