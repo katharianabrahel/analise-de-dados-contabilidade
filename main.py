@@ -2,19 +2,13 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import re
-
+from despesas import get_despesas, mostrar_despesas
+from graficos import calculate_total_by_coluna, grafico_barra_despesa
 
 @st.cache_data
 def load_data(file_path):
     data = pd.read_excel(file_path, skiprows=4)
     return data
-
-
-def calculate_total_by_coluna(data, selected_uf, selected_ano):
-    filtered_data = data[(data['UF'] == selected_uf) & (data['Ano'] == selected_ano)]
-    total_by_coluna = filtered_data.groupby('Coluna')['Valor (R$)'].sum().reset_index()
-    return total_by_coluna
-
 
 def get_subitens(data, selected_conta):
     # Obtém o número (xx) do valor selecionado
@@ -26,18 +20,14 @@ def get_subitens(data, selected_conta):
 
 def main():
     st.set_page_config(layout="wide")
-    st.title('Análise de Despesas por Função 2018-2021')
-    st.sidebar.title('Opções')
+    st.title('Análise de Seguridade Social')
     
-
-    file_path = st.sidebar.file_uploader('Carregar arquivo Excel (.xlsx)', type=['xlsx'])
+    
+    file_path = "FINBRA_Estados-DF_Despesas por Função_2018-2021.xlsx"
     
     if file_path is not None:
         data = load_data(file_path)
-
-        st.subheader('Dados brutos')
-        st.write(data)
-
+        
         st.subheader('Filtros')
 
         col1, col2, col3, col4 = st.columns(4)
@@ -51,6 +41,7 @@ def main():
 
         with col3:
             selected_ano = st.selectbox('Filtrar por Ano', data['Ano'].unique())
+        
         with col4:
             conta_options = ['08 - Assistência Social', '09 - Previdência Social','10 - Saúde']
             selected_conta = st.selectbox('Filtrar por Conta', conta_options)
@@ -61,11 +52,14 @@ def main():
         st.subheader('Dados Filtrados')
         st.write(filtered_data)
 
-        total_by_coluna = calculate_total_by_coluna(data, selected_uf, selected_ano)
-
-        st.subheader('Gráfico de Valor Total por Tipo de Despesa')
-        fig = px.bar(total_by_coluna, x='Coluna', y='Valor (R$)', title=f'Valor Total por Tipo de Despesa em {selected_ano} ({selected_uf})')
-        st.plotly_chart(fig)
-
+        #Valores de Despesas
+        despesas = get_despesas(data, selected_uf, selected_ano, selected_conta)
+        mostrar_despesas(despesas, selected_uf, selected_ano)
+        
+        #Gráfico Despesa
+        total_by_coluna = calculate_total_by_coluna(data, selected_uf, selected_ano, selected_conta)
+        grafico_barra_despesa(total_by_coluna)
+        
+            
 if __name__ == '__main__':
     main()
