@@ -57,8 +57,9 @@ def main():
         mostrar_despesas(despesas, selected_uf, selected_ano)
         
         #Gráfico Despesa
-        total_by_coluna = calculate_total_by_coluna(data, selected_uf, selected_ano, selected_conta)
-        grafico_barra_despesa(total_by_coluna)
+        with st.expander("Visualizar gráfico de despesa"):
+            total_by_coluna = calculate_total_by_coluna(data, selected_uf, selected_ano, selected_conta)
+            grafico_barra_despesa(total_by_coluna)
         
             
 if __name__ == '__main__':

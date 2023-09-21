@@ -52,7 +52,7 @@ def mostrar_despesas(despesas, selected_uf=None, selected_ano=None):
     Os dados colocados são: Despesas Empenhadas, Despesas Liquidadas, Despesas Pagas, Execução de Despesa.
     """
     if selected_uf != None and selected_ano != None: 
-        st.subheader(f'Valor Total por Tipo de Despesa em {selected_ano} ({selected_uf})')
+        st.subheader(f'Valor Total por Estágio de Despesa em {selected_ano} ({selected_uf})')
     
     col5, col6, col7, col8 = st.columns(4) 
     col5.metric("Despesas Empenhadas", formatar_numero(despesas[0]))
