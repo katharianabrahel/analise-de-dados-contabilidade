@@ -20,6 +20,18 @@ def get_subitens(data, selected_conta):
         subitens = data[data['Conta'].str.startswith(selected_number) | data['Conta'].str.startswith(f'FU{selected_number}')]
     return subitens
 
+def formatar_valor(valor):
+    try:
+        valor = float(valor)
+        if valor.is_integer():
+            return "{:,.0f}".format(valor).replace(",", ".")
+        else:
+            return "{:,.2f}".format(valor).replace(",", "|").replace(".", ",").replace("|", ".")
+    except ValueError:
+        # Se não for um número, retorna o valor original.
+        return valor
+
+
 
 def main():
     st.set_page_config(layout="wide")
@@ -57,10 +69,14 @@ def main():
             filtered_data = filtered_data[(filtered_data['Coluna'] == selected_coluna)]
         if selected_ano != "Todos os Anos":
             filtered_data = filtered_data[(filtered_data['Ano'] == selected_ano)]
-        #if selected_conta != "Todas as Contas":
+
         filtered_data = get_subitens(filtered_data, selected_conta)      
         
         st.subheader('Dados Filtrados')
+        # Aplica a função de formatação a todas as colunas numéricas.
+        colunas_numericas = filtered_data.select_dtypes(include=['float64', 'int64']).columns
+        filtered_data[colunas_numericas] = filtered_data[colunas_numericas].applymap(formatar_valor)
+
         st.write(filtered_data)
 
         #Valores de Despesas
