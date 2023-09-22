@@ -11,10 +11,13 @@ def load_data(file_path):
     return data
 
 def get_subitens(data, selected_conta):
-    # Obtém o número (xx) do valor selecionado
-    selected_number = selected_conta.split(' ')[0]
-    # Filtra os dados para incluir registros que começam com o mesmo número ou "FUxx"
-    subitens = data[data['Conta'].str.startswith(selected_number) | data['Conta'].str.startswith(f'FU{selected_number}')]
+    if selected_conta == "Todas as Contas":
+        # Se "Todas as Contas" estiver selecionada, retornar todos os itens e subitens da Conta.
+        subitens = data[data['Conta'].str.startswith('08') | data['Conta'].str.startswith('09') | data['Conta'].str.startswith('10') | data['Conta'].str.startswith('FU08') | data['Conta'].str.startswith('FU09') | data['Conta'].str.startswith('FU10')]
+    else:
+        # Caso contrário, obtenha apenas os subitens relacionados à conta selecionada.
+        selected_number = selected_conta.split(' ')[0]
+        subitens = data[data['Conta'].str.startswith(selected_number) | data['Conta'].str.startswith(f'FU{selected_number}')]
     return subitens
 
 
@@ -27,7 +30,6 @@ def main():
     
     if file_path is not None:
         data = load_data(file_path)
-        data = data.query('Conta in ["08 - Assistência Social","09 - Previdência Social","10 - Saúde"]')
         data = data.query('Coluna in ["Despesas Empenhadas","Despesas Liquidadas","Despesas Pagas"]')
         st.subheader('Filtros')
 
@@ -55,14 +57,14 @@ def main():
             filtered_data = filtered_data[(filtered_data['Coluna'] == selected_coluna)]
         if selected_ano != "Todos os Anos":
             filtered_data = filtered_data[(filtered_data['Ano'] == selected_ano)]
-        if selected_conta != "Todas as Contas":
-            filtered_data = filtered_data[(filtered_data['Conta'] == selected_conta)]        
+        #if selected_conta != "Todas as Contas":
+        filtered_data = get_subitens(filtered_data, selected_conta)      
         
         st.subheader('Dados Filtrados')
         st.write(filtered_data)
 
         #Valores de Despesas
-        
+        data = data.query('Conta in ["08 - Assistência Social","09 - Previdência Social","10 - Saúde"]')
         st.subheader(f'Valor Total por Estágio de Despesa ({selected_ano}, {selected_uf}, {selected_conta})')
         despesas = get_despesas(data, selected_uf, selected_ano, selected_conta)
         mostrar_despesas(despesas)
