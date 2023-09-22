@@ -27,34 +27,45 @@ def main():
     
     if file_path is not None:
         data = load_data(file_path)
-        
+        data = data.query('Conta in ["08 - Assistência Social","09 - Previdência Social","10 - Saúde"]')
+        data = data.query('Coluna in ["Despesas Empenhadas","Despesas Liquidadas","Despesas Pagas"]')
         st.subheader('Filtros')
 
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            selected_uf = st.selectbox('Filtrar por UF', data['UF'].unique())
+            selected_uf = st.selectbox('Filtrar por UF', ['Todas as UF'] + list(data['UF'].unique()))
 
         with col2:
-           coluna_options = ['Despesas Empenhadas', 'Despesas Liquidadas', 'Despesas Pagas']
-           selected_coluna = st.selectbox('Filtrar por Coluna', coluna_options)
+            coluna_options = ['Todas as Colunas'] + ['Despesas Empenhadas', 'Despesas Liquidadas', 'Despesas Pagas']
+            selected_coluna = st.selectbox('Filtrar por Coluna', coluna_options)
 
         with col3:
-            selected_ano = st.selectbox('Filtrar por Ano', data['Ano'].unique())
-        
-        with col4:
-            conta_options = ['08 - Assistência Social', '09 - Previdência Social','10 - Saúde']
-            selected_conta = st.selectbox('Filtrar por Conta', conta_options)
-  
-        filtered_data = get_subitens(data, selected_conta)
-        filtered_data = filtered_data[(filtered_data['UF'] == selected_uf) & (filtered_data['Coluna'] == selected_coluna) & (filtered_data['Ano'] == selected_ano)]
+            selected_ano = st.selectbox('Filtrar por Ano', ['Todos os Anos'] + list(data['Ano'].unique()))
 
+        with col4:
+            conta_options = ['Todas as Contas'] + ['08 - Assistência Social', '09 - Previdência Social','10 - Saúde']
+            selected_conta = st.selectbox('Filtrar por Conta', conta_options)
+
+        filtered_data = data.copy()
+        
+        if selected_uf != "Todas as UF":
+            filtered_data = filtered_data[(filtered_data['UF'] == selected_uf)]
+        if selected_coluna != "Todas as Colunas":
+            filtered_data = filtered_data[(filtered_data['Coluna'] == selected_coluna)]
+        if selected_ano != "Todos os Anos":
+            filtered_data = filtered_data[(filtered_data['Ano'] == selected_ano)]
+        if selected_conta != "Todas as Contas":
+            filtered_data = filtered_data[(filtered_data['Conta'] == selected_conta)]        
+        
         st.subheader('Dados Filtrados')
         st.write(filtered_data)
 
         #Valores de Despesas
+        
+        st.subheader(f'Valor Total por Estágio de Despesa ({selected_ano}, {selected_uf}, {selected_conta})')
         despesas = get_despesas(data, selected_uf, selected_ano, selected_conta)
-        mostrar_despesas(despesas, selected_uf, selected_ano)
+        mostrar_despesas(despesas)
         
         #Gráfico Despesa
         with st.expander("Visualizar gráfico de despesa"):

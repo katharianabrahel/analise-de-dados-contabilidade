@@ -37,8 +37,16 @@ def get_despesas(data, selected_uf, selected_ano, selected_conta):
     Função responsável por entregar as despesas empenhadas, liquidadas e pagas.
     Os parâmetros para filtrar as despesas são: UF, ANO e CONTA
     """
-    filtered_data = data[(data['UF'] == selected_uf) & (data['Ano'] == selected_ano) & (data['Conta'] == selected_conta)]
+    
+    filtered_data = data.copy()
 
+    if selected_uf != "Todas as UF":
+        filtered_data = filtered_data[(filtered_data['UF'] == selected_uf)]
+    if selected_ano != "Todos os Anos":
+        filtered_data = filtered_data[(filtered_data['Ano'] == selected_ano)]
+    if selected_conta != "Todas as Contas":
+        filtered_data = filtered_data[(filtered_data['Conta'] == selected_conta)]    
+    
     despesas_empenhadas = filtered_data[filtered_data['Coluna'] == 'Despesas Empenhadas']['Valor (R$)'].sum()
     despesas_liquidadas = filtered_data[filtered_data['Coluna'] == 'Despesas Liquidadas']['Valor (R$)'].sum()
     despesas_pagas = filtered_data[filtered_data['Coluna'] == 'Despesas Pagas']['Valor (R$)'].sum()
@@ -46,14 +54,11 @@ def get_despesas(data, selected_uf, selected_ano, selected_conta):
     return [despesas_empenhadas, despesas_liquidadas, despesas_pagas]
 
 
-def mostrar_despesas(despesas, selected_uf=None, selected_ano=None):
+def mostrar_despesas(despesas):
     """
     Função responsável por colocar visualmente as despesas no Streamlit.
     Os dados colocados são: Despesas Empenhadas, Despesas Liquidadas, Despesas Pagas, Execução de Despesa.
     """
-    if selected_uf != None and selected_ano != None: 
-        st.subheader(f'Valor Total por Estágio de Despesa em {selected_ano} ({selected_uf})')
-    
     col5, col6, col7, col8 = st.columns(4) 
     col5.metric("Despesas Empenhadas", formatar_numero(despesas[0]))
     col6.metric("Despesas Liquidadas", formatar_numero(despesas[1]))
