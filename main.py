@@ -73,6 +73,8 @@ def main():
         filtered_data = get_subitens(filtered_data, selected_conta)      
         
         st.subheader('Dados Filtrados')
+        
+        filtered_data_subfunctions = filtered_data.copy()
         # Aplica a função de formatação a todas as colunas numéricas.
         colunas_numericas = filtered_data.select_dtypes(include=['float64', 'int64']).columns
         filtered_data[colunas_numericas] = filtered_data[colunas_numericas].applymap(formatar_valor)
@@ -90,6 +92,22 @@ def main():
             total_by_coluna = calculate_total_by_coluna(data, selected_uf, selected_ano, selected_conta)
             grafico_barra_despesa(total_by_coluna)
         
+        #Gráfico Composição de Função
+
+        st.subheader(f"Gráfico de Composição de Funções")
+        
+        if ((selected_uf != "Todas as UF") and (selected_conta != "Todas as Contas") and (selected_coluna != "Todas as Colunas") and (selected_ano != "Todos os Anos")):
+            st.text(f"UF: {selected_uf} / Ano: {selected_ano} / Fase de Despesa: {selected_coluna} / Função: {selected_conta}")
+            valores_subfuncoes = filtered_data_subfunctions['Valor (R$)'].tolist()
+            nomes_subfuncoes = filtered_data_subfunctions['Conta'].tolist()
+            indice = nomes_subfuncoes.index(selected_conta)
+            valores_subfuncoes.pop(indice)
+            nomes_subfuncoes.pop(indice)
             
+            fig = px.pie(values=valores_subfuncoes, names=nomes_subfuncoes)
+            st.plotly_chart(fig)
+        else:
+            st.warning('Você precisa especificar mais os critérios!', icon="⚠️")
+
 if __name__ == '__main__':
     main()
