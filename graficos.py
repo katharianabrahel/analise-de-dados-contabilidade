@@ -18,5 +18,5 @@ def calculate_total_by_coluna(data, selected_uf, selected_ano, selected_conta):
     return total_by_coluna
 
 def grafico_barra_despesa(total_by_coluna):
-    fig = px.bar(total_by_coluna, x='Status', y='Valor (R$)')
+    fig = px.bar(total_by_coluna, x='Coluna', y='Valor (R$)')
     st.plotly_chart(fig)
