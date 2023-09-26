@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import re
 from despesas import get_despesas, mostrar_despesas
 from graficos import calculate_total_by_coluna, grafico_barra_despesa, calculate_total_by_state_and_account, create_stacked_bar_chart
 
@@ -53,13 +54,20 @@ def main():
         if funcionalidades == 'Análise Detalhada por Estados':
             st.sidebar.subheader('Filtros')
 
-            selected_uf = st.sidebar.selectbox('Filtrar por UF', ['Todas as UF'] + list(data['UF'].unique()))
+            col1, col2, col3, col4 = st.columns(4)
 
+            
+            selected_uf = st.sidebar.selectbox('Filtrar por UF', ['Todas as UF'] + list(data['UF'].unique()))
+                
+
+            
             coluna_options = ['Todas as Colunas'] + ['Despesas Empenhadas', 'Despesas Liquidadas', 'Despesas Pagas']
             selected_coluna = st.sidebar.selectbox('Filtrar por Coluna', coluna_options)
 
+           
             selected_ano = st.sidebar.selectbox('Filtrar por Ano', ['Todos os Anos'] + list(data['Ano'].unique()))
 
+          
             conta_options = ['Todas as Contas'] + ['08 - Assistência Social', '09 - Previdência Social','10 - Saúde']
             selected_conta = st.sidebar.selectbox('Filtrar por Conta', conta_options)
 
@@ -97,7 +105,8 @@ def main():
 
             #Valores de Despesas
             data = data.query('Conta in ["08 - Assistência Social","09 - Previdência Social","10 - Saúde"]')
-            st.subheader(f'Valor Total por Estágio de Despesa ({selected_ano}, {selected_uf}, {selected_conta})')
+            st.subheader(f'Valor Total por Estágio de Despesa')
+            st.text(f"UF: {selected_uf} / Ano: {selected_ano} / Função: {selected_conta}")
             despesas = get_despesas(data, selected_uf, selected_ano, selected_conta)
             mostrar_despesas(despesas)
             
@@ -107,6 +116,7 @@ def main():
                 grafico_barra_despesa(total_by_coluna)
             
             #Gráfico Composição de Função
+
             st.subheader(f"Gráfico de Composição de Funções")
             
             if ((selected_uf != "Todas as UF") and (selected_conta != "Todas as Contas") and (selected_coluna != "Todas as Colunas") and (selected_ano != "Todos os Anos")):
@@ -140,21 +150,6 @@ def main():
                 # Cria o gráfico de barras empilhadas
                 stacked_bar_chart = create_stacked_bar_chart(total_by_state_account, selected_conta)
                 st.plotly_chart(stacked_bar_chart)
-
-
-        pessoas = [
-            {"nome": "Felipe Gusmão", "github_url": "https://github.com/felipevgusmao"},
-            {"nome": "Hallan Ângelo", "github_url": "https://github.com/hallanangelo"},
-            {"nome": "Katharian Abrahel", "github_url": "https://github.com/katharianabrahel"},
-            {"nome": "Renata Santana", "github_url": "https://github.com/RenataAndradeSnatana"}
-        ]
-
-        st.write("\n\n")
-        st.markdown("---")
-        st.write("Desenvolvido por:")
-        pessoas_links = " | ".join([f'<a href="{pessoa["github_url"]}" style="font-size: 20px; text-decoration: none;">{pessoa["nome"]}</a>' for pessoa in pessoas])
-        st.markdown(pessoas_links, unsafe_allow_html=True)
-        
 
 if __name__ == '__main__':
     main()
