@@ -7,9 +7,11 @@ def formatar_numero(numero):
     """
     Função responsável por colocar sufixo nos números baseados na escala númerica.
     """
-    sufixos = ['', ' mil', ' milhão', ' bilhão', ' trilhão']
+    sufixos_singular = ['', ' mil', ' milhão', ' bilhão', ' trilhão']
+    sufixos_plural = ['', ' mil', ' milhões', ' bilhões', ' trilhões']
+
     escala = 0
-    while numero >= 1000 and escala < len(sufixos) - 1:
+    while numero >= 1000 and escala < len(sufixos_singular) - 1:
         escala += 1
         numero /= 1000.0
     
@@ -17,7 +19,11 @@ def formatar_numero(numero):
     
     numero_formatado = numero_formatado.rstrip('0').rstrip('.')
     
-    numero_formatado += sufixos[escala]
+    comparacao = numero_formatado.split('.')
+    if comparacao[0] == '1':
+        numero_formatado += sufixos_singular[escala]
+    else:
+        numero_formatado += sufixos_plural[escala]
     
     return numero_formatado
 
@@ -63,4 +69,4 @@ def mostrar_despesas(despesas):
     col5.metric("Despesas Empenhadas", formatar_numero(despesas[0]))
     col6.metric("Despesas Liquidadas", formatar_numero(despesas[1]))
     col7.metric("Despesas Pagas", formatar_numero(despesas[2]))
-    col8.metric("Execução de Despesa", decimal_para_porcentagem(despesas[2]/despesas[0]))
+    col8.metric("Taxa de Execução", decimal_para_porcentagem(despesas[2]/despesas[0]))
