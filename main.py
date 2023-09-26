@@ -105,7 +105,8 @@ def main():
 
             #Valores de Despesas
             data = data.query('Conta in ["08 - Assistência Social","09 - Previdência Social","10 - Saúde"]')
-            st.subheader(f'Valor Total por Estágio de Despesa ({selected_ano}, {selected_uf}, {selected_conta})')
+            st.subheader(f'Valor Total por Estágio de Despesa')
+            st.text(f"UF: {selected_uf} / Ano: {selected_ano} / Função: {selected_conta}")
             despesas = get_despesas(data, selected_uf, selected_ano, selected_conta)
             mostrar_despesas(despesas)
             
