@@ -91,9 +91,9 @@ def main():
 
         toggle_state = st.checkbox("Visualizar subfunções")
         if toggle_state:
-            st.write(data_visualization)
-        else:
             st.write(filtered_data)
+        else:
+            st.write(data_visualization)
 
         #Valores de Despesas
         data = data.query('Conta in ["08 - Assistência Social","09 - Previdência Social","10 - Saúde"]')
