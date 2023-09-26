@@ -5,10 +5,12 @@ import re
 from despesas import get_despesas, mostrar_despesas
 from graficos import calculate_total_by_coluna, grafico_barra_despesa, calculate_total_by_state_and_account, create_stacked_bar_chart
 
+
 @st.cache_data
 def load_data(file_path):
     data = pd.read_excel(file_path, skiprows=4)
     return data
+
 
 def get_subitens(data, selected_conta):
     if selected_conta == "Todas as Contas":
@@ -19,6 +21,7 @@ def get_subitens(data, selected_conta):
         selected_number = selected_conta.split(' ')[0]
         subitens = data[data['Conta'].str.startswith(selected_number) | data['Conta'].str.startswith(f'FU{selected_number}')]
     return subitens
+
 
 def formatar_valor(valor):
     try:
@@ -32,9 +35,9 @@ def formatar_valor(valor):
         return valor
 
 
-
 def main():
-    st.set_page_config(layout="wide")
+    st.set_page_config(layout="wide", page_title="Análise de Seguridade Social")
+    st.sidebar.image('./images/logo-cin.png', use_column_width=True)
     st.title('Análise de Seguridade Social')
     
     
@@ -49,24 +52,24 @@ def main():
         data = data.query('Coluna in ["Despesas Empenhadas","Despesas Liquidadas","Despesas Pagas"]')
         
         if funcionalidades == 'Análise Detalhada por Estados':
-            st.subheader('Filtros')
+            st.sidebar.subheader('Filtros')
 
             col1, col2, col3, col4 = st.columns(4)
 
-            with col1:
-                selected_uf = st.selectbox('Filtrar por UF', ['Todas as UF'] + list(data['UF'].unique()))
+            
+            selected_uf = st.sidebar.selectbox('Filtrar por UF', ['Todas as UF'] + list(data['UF'].unique()))
                 
 
-            with col2:
-                coluna_options = ['Todas as Colunas'] + ['Despesas Empenhadas', 'Despesas Liquidadas', 'Despesas Pagas']
-                selected_coluna = st.selectbox('Filtrar por Coluna', coluna_options)
+            
+            coluna_options = ['Todas as Colunas'] + ['Despesas Empenhadas', 'Despesas Liquidadas', 'Despesas Pagas']
+            selected_coluna = st.sidebar.selectbox('Filtrar por Coluna', coluna_options)
 
-            with col3:
-                selected_ano = st.selectbox('Filtrar por Ano', ['Todos os Anos'] + list(data['Ano'].unique()))
+           
+            selected_ano = st.sidebar.selectbox('Filtrar por Ano', ['Todos os Anos'] + list(data['Ano'].unique()))
 
-            with col4:
-                conta_options = ['Todas as Contas'] + ['08 - Assistência Social', '09 - Previdência Social','10 - Saúde']
-                selected_conta = st.selectbox('Filtrar por Conta', conta_options)
+          
+            conta_options = ['Todas as Contas'] + ['08 - Assistência Social', '09 - Previdência Social','10 - Saúde']
+            selected_conta = st.sidebar.selectbox('Filtrar por Conta', conta_options)
 
             filtered_data = data.copy()
             data_visualization = data.copy()
