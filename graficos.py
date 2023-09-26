@@ -27,7 +27,6 @@ def calculate_total_by_state_and_account(data, account):
 
 
 def create_stacked_bar_chart(data, account):
-    fig = px.bar(data, x='UF', y='Valor (R$)', color='Coluna', barmode='group',
-                 title=f'Somatório das Despesas por Estado para a Conta {account}')
+    fig = px.bar(data, x='UF', y='Valor (R$)', color='Coluna', barmode='group')
     fig.update_layout(xaxis_title='Estado', yaxis_title='Valor (R$)', width=1200, height=600)
     return fig

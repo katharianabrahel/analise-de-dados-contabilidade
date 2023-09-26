@@ -128,16 +128,24 @@ def main():
             else:
                 st.warning('Você precisa especificar mais os critérios!', icon="⚠️")
         else:
+            selected_year = st.sidebar.selectbox('Filtrar por Ano', ['Todos os Anos'] + list(data['Ano'].unique()))
             options = ['08 - Assistência Social', '09 - Previdência Social', '10 - Saúde']
 
             for selected_conta in options:
-                st.subheader(f'Somatório das Despesas por Estado para a Conta {selected_conta}')
+                
+                if selected_year == 'Todos os Anos':
+                    st.subheader(f'Somatório das Despesas por Estado para a Conta {selected_conta}')
+                    filtered_data_year = data
+                else:
+                    st.subheader(f'Despesas por Estado para a Conta {selected_conta} em {selected_year}')
+                    filtered_data_year = data[data['Ano'] == selected_year]
                 
                 # Calcula o somatório das despesas por estado e por tipo de conta
-                total_by_state_account = calculate_total_by_state_and_account(data, selected_conta)
+                total_by_state_account = calculate_total_by_state_and_account(filtered_data_year, selected_conta)
 
                 # Cria o gráfico de barras empilhadas
                 stacked_bar_chart = create_stacked_bar_chart(total_by_state_account, selected_conta)
                 st.plotly_chart(stacked_bar_chart)
+
 if __name__ == '__main__':
     main()
