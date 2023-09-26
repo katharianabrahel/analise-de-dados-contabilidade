@@ -42,6 +42,7 @@ def main():
     
     if file_path is not None:
         data = load_data(file_path)
+        data.drop(columns=['Identificador da Conta', 'Cod.IBGE'], axis=1, inplace=True)
         data = data.query('Coluna in ["Despesas Empenhadas","Despesas Liquidadas","Despesas Pagas"]')
         st.subheader('Filtros')
 
