@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import re
 from despesas import get_despesas, mostrar_despesas
-from graficos import calculate_total_by_coluna, grafico_barra_despesa
+from graficos import calculate_total_by_coluna, grafico_barra_despesa, calculate_total_by_state_and_account, create_stacked_bar_chart
 
 @st.cache_data
 def load_data(file_path):
@@ -128,6 +128,16 @@ def main():
             else:
                 st.warning('Você precisa especificar mais os critérios!', icon="⚠️")
         else:
-            st.subheader("Nada ainda")
+            options = ['08 - Assistência Social', '09 - Previdência Social', '10 - Saúde']
+
+            for selected_conta in options:
+                st.subheader(f'Somatório das Despesas por Estado para a Conta {selected_conta}')
+                
+                # Calcula o somatório das despesas por estado e por tipo de conta
+                total_by_state_account = calculate_total_by_state_and_account(data, selected_conta)
+
+                # Cria o gráfico de barras empilhadas
+                stacked_bar_chart = create_stacked_bar_chart(total_by_state_account, selected_conta)
+                st.plotly_chart(stacked_bar_chart)
 if __name__ == '__main__':
     main()

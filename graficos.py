@@ -20,3 +20,14 @@ def calculate_total_by_coluna(data, selected_uf, selected_ano, selected_conta):
 def grafico_barra_despesa(total_by_coluna):
     fig = px.bar(total_by_coluna, x='Coluna', y='Valor (R$)')
     st.plotly_chart(fig)
+
+def calculate_total_by_state_and_account(data, account):
+    total_by_state = data[data['Conta'] == account].groupby(['UF', 'Coluna'])['Valor (R$)'].sum().reset_index()
+    return total_by_state
+
+
+def create_stacked_bar_chart(data, account):
+    fig = px.bar(data, x='UF', y='Valor (R$)', color='Coluna', barmode='group',
+                 title=f'Somatório das Despesas por Estado para a Conta {account}')
+    fig.update_layout(xaxis_title='Estado', yaxis_title='Valor (R$)', width=1200, height=600)
+    return fig
