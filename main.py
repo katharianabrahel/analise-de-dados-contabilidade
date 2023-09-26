@@ -50,6 +50,7 @@ def main():
 
         with col1:
             selected_uf = st.selectbox('Filtrar por UF', ['Todas as UF'] + list(data['UF'].unique()))
+            
 
         with col2:
             coluna_options = ['Todas as Colunas'] + ['Despesas Empenhadas', 'Despesas Liquidadas', 'Despesas Pagas']
@@ -63,13 +64,20 @@ def main():
             selected_conta = st.selectbox('Filtrar por Conta', conta_options)
 
         filtered_data = data.copy()
+        data_visualization = data.copy()
+        data_visualization = data_visualization.query('Conta in ["08 - Assistência Social","09 - Previdência Social","10 - Saúde"]')
         
         if selected_uf != "Todas as UF":
             filtered_data = filtered_data[(filtered_data['UF'] == selected_uf)]
+            data_visualization = data_visualization[(data_visualization['UF'] == selected_uf)]
         if selected_coluna != "Todas as Colunas":
             filtered_data = filtered_data[(filtered_data['Coluna'] == selected_coluna)]
+            data_visualization = data_visualization[(data_visualization['Coluna'] == selected_coluna)]
         if selected_ano != "Todos os Anos":
             filtered_data = filtered_data[(filtered_data['Ano'] == selected_ano)]
+            data_visualization = data_visualization[(data_visualization['Ano'] == selected_ano)]
+        if selected_conta != 'Todas as Contas':
+            data_visualization = data_visualization[(data_visualization['Conta'] == selected_conta)]
 
         filtered_data = get_subitens(filtered_data, selected_conta)      
         
@@ -79,8 +87,13 @@ def main():
         # Aplica a função de formatação a todas as colunas numéricas.
         colunas_numericas = filtered_data.select_dtypes(include=['float64', 'int64']).columns
         filtered_data[colunas_numericas] = filtered_data[colunas_numericas].applymap(formatar_valor)
+        data_visualization[colunas_numericas] = data_visualization[colunas_numericas].applymap(formatar_valor)
 
-        st.write(filtered_data)
+        toggle_state = st.checkbox("Visualizar subfunções")
+        if toggle_state:
+            st.write(data_visualization)
+        else:
+            st.write(filtered_data)
 
         #Valores de Despesas
         data = data.query('Conta in ["08 - Assistência Social","09 - Previdência Social","10 - Saúde"]')
